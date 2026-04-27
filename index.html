@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ❤️</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:#0f0f0f;
+    color:white;
+    overflow:hidden;
+}
+
+/* glow */
+body::before{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    background:radial-gradient(circle,#ff6b81,transparent);
+    top:-150px;
+    left:-150px;
+    filter:blur(120px);
+    opacity:0.25;
+}
+
+/* slide */
+.slide{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    padding:20px;
+    animation:fade 1s ease;
+}
+.active{display:flex}
+
+/* button */
+.nextBtn{
+    margin-top:20px;
+    padding:12px 25px;
+    border:none;
+    border-radius:30px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+    cursor:pointer;
+}
+.nextBtn:hover{
+    background:white;
+    color:black;
+}
+
+/* chat */
+.chatBox{
+    width:90%;
+    max-width:400px;
+    height:70vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding:10px;
+}
+.bubble{
+    max-width:70%;
+    padding:10px;
+    margin:5px;
+    border-radius:12px;
+    font-size:14px;
+    opacity:0;
+    animation:fadeIn 0.5s forwards;
+}
+.left{background:#2a2a2a;align-self:flex-start}
+.right{background:#25d366;color:black;align-self:flex-end}
+.time{font-size:10px;opacity:0.6;text-align:right}
+
+@keyframes fadeIn{to{opacity:1}}
+
+/* foto */
+.imgWrap{width:80%;max-width:400px}
+.imgWrap img{
+    width:100%;
+    border-radius:20px;
+}
+
+/* video */
+.videoWrap{width:85%;max-width:500px}
+video{width:100%;border-radius:20px}
+
+/* paper */
+.paper{
+    background:white;
+    color:#333;
+    padding:25px;
+    border-radius:10px;
+    max-width:500px;
+    font-family:Georgia,serif;
+}
+
+/* days */
+.days{
+    margin-top:10px;
+    font-size:14px;
+    opacity:0.6;
+}
+
+/* ending */
+.lastMessage{
+    margin-top:15px;
+    opacity:0;
+    transition:1.5s;
+}
+.showText{opacity:1}
+
+</style>
+</head>
+
+<body>
+
+<!-- GAME -->
+<div class="slide active" id="s1">
+    <h2>Tangkap 10 hati 💖</h2>
+    <p id="score">0 / 10</p>
+</div>
+
+<!-- CHAT -->
+<div class="slide" id="s2">
+    <div class="chatBox" id="chatBox"></div>
+    <button class="nextBtn" onclick="next()">Next</button>
+</div>
+
+<!-- FOTO -->
+<div class="slide" id="s3">
+    <div class="imgWrap"><img src="foto1.jpeg"></div>
+    <p class="days" id="days"></p>
+    <button class="nextBtn" onclick="next()">Next</button>
+</div>
+
+<div class="slide" id="s4">
+    <div class="imgWrap"><img src="foto2.jpg.jpeg"></div>
+    <button class="nextBtn" onclick="next()">Next</button>
+</div>
+
+<div class="slide" id="s5">
+    <div class="imgWrap"><img src="foto5.jpg.jpeg"></div>
+    <button class="nextBtn" onclick="next()">Next</button>
+</div>
+
+<!-- VIDEO --> 
+<div class="slide" id="s6">
+    <div class="videoWrap">
+        <video id="videoMoment" src="video.mp4" controls></video>
+    </div>
+    <button class="nextBtn" onclick="next()">Next</button>
+</div>
+
+<!-- SURAT -->
+<div class="slide" id="s7">
+    <div class="paper">
+        <h3>Untuk Kamu</h3>
+        <p>
+        Nggak berasa ya, dari awal kita kneal sampai sekarang sudah
+        sejauh ini. Banyak cerita yang sudah kita lewati -tawa,tangis,
+        marah bahkan diam-diaman....tapi pada akhirnya kita tetap memilih
+        bertahan.  
+          
+        Terimakasih sudah tetap ada, sudah sabar, dan susah mau terus jalan
+        bareng aku sampai hari ini. Aku tahu hubungan kita nggak selalu mudah
+        tpi justru dari situ aku belajar  kalau kamu itu berharga banget buat aku.   
+
+        Aku nggak minta hubungan yang selalu sempurna, cukup kita yang terus 
+        saling mengusahakan. Semoga ke depan kita bisa lebih kuat, lebih dewasa,
+        dan lebih ngerti satu sama lain.  
+        aku cuma butuh kamu yang tetap mau bertahan.
+        terimakasih untuk 3 tahum ini dan semoga...ini bukan akhir tapi awal dari perjlanan
+        yang lebih panjang lagi❤️.    
+
+        Happy Anniversary ❤️
+        </p>
+    </div>
+    <button class="nextBtn" onclick="next()">Next</button>
+</div>
+
+<!-- END -->
+<div class="slide" id="s8">
+    <canvas id="heartCanvas" width="400" height="400"></canvas>
+    <h2>Happy Anniversary ❤️</h2>
+    <p class="days" id="days2"></p>
+    <p id="lastMessage" class="lastMessage"></p>
+</div>
+
+<!-- AUDIO -->
+<audio id="music1" loop>
+<source src="music.mpeg">
+</audio>
+<audio id="music2" loop>
+<source src="music2.mpeg">
+</audio>
+
+<script>
+
+// HITUNG HARI
+const startDate = new Date("2023-03-12"); // GANTI
+const now = new Date();
+const diffDays = Math.floor((now - startDate)/(1000*60*60*24));
+
+document.getElementById("days").innerText = "Bersama selama " + diffDays + " hari";
+document.getElementById("days2").innerText = diffDays + " hari bersama ❤️";
+
+// NAV
+let current=1;
+function next(){
+    document.getElementById("s"+current).classList.remove("active");
+    current++;
+    document.getElementById("s"+current).classList.add("active");
+
+    if(current==2) showChat();
+    if(current==8) startEnding();
+}
+
+// GAME
+let score=0;
+setInterval(()=>{
+    if(current!==1) return;
+    const h=document.createElement("div");
+    h.innerHTML="💖";
+    h.style.position="absolute";
+    h.style.left=Math.random()*window.innerWidth+"px";
+    h.style.top="0px";
+    document.body.appendChild(h);
+
+    let fall=setInterval(()=>{
+        h.style.top=(h.offsetTop+4)+"px";
+        if(h.offsetTop>window.innerHeight){
+            h.remove();
+            clearInterval(fall);
+        }
+    },20);
+
+    h.onclick=()=>{
+        score++;
+        document.getElementById("score").innerText=score+" / 10";
+        h.remove();
+        if(score>=10){
+            document.getElementById("music1").play();
+            next();
+        }
+    }
+},700);
+
+// CHAT
+const chats=[
+{text:"mas",side:"left",time:"09:30"},
+{text:"mas kirim foto",side:"left",time:"15:11"},
+{text:"Moh we rung adus🤭",side:"right",time:"15:11"},
+{text:"yek kok ngerti",side:"left",time:"15:12"},
+{text:"awal kenal lucu yaa😄",side:"right",time:"15:12"},
+];
+
+function showChat(){
+    const box=document.getElementById("chatBox");
+    let i=0;
+    function run(){
+        if(i>=chats.length) return;
+        const m=document.createElement("div");
+        m.className="bubble "+chats[i].side;
+        m.innerHTML=chats[i].text+`<div class="time">${chats[i].time}</div>`;
+        box.appendChild(m);
+        box.scrollTop=box.scrollHeight;
+        i++;
+        setTimeout(run,1200);
+    }
+    run();
+}
+
+// VIDEO
+const video=document.getElementById("videoMoment");
+const music=document.getElementById("music1");
+
+video.addEventListener("play",()=>music.pause());
+video.addEventListener("ended",()=>music.play());
+
+// ENDING
+function startEnding(){
+    music.pause();
+    document.getElementById("music2").play();
+    drawHeart();
+}
+
+// HEART
+function drawHeart(){
+    const c=document.getElementById("heartCanvas");
+    const ctx=c.getContext("2d");
+    let t=0;
+
+    function x(t){return 16*Math.pow(Math.sin(t),3);}
+    function y(t){
+        return 13*Math.cos(t)-5*Math.cos(2*t)
+        -2*Math.cos(3*t)-Math.cos(4*t);
+    }
+
+    ctx.translate(200,200);
+    ctx.scale(10,-10);
+
+    function anim(){
+        ctx.clearRect(-50,-50,100,100);
+        ctx.beginPath();
+        ctx.strokeStyle="red";
+        ctx.lineWidth=0.4;
+
+        for(let i=0;i<t;i+=0.02){
+            ctx.lineTo(x(i),y(i));
+        }
+
+        ctx.stroke();
+        t+=0.01;
+
+        if(t<Math.PI*2){
+            requestAnimationFrame(anim);
+        }else{
+            showLastMessage(1500);
+        }
+    }
+    anim();
+}
+
+// LAST MESSAGE
+function showLastMessage(){
+    const text="aku nggak butuh yang sempurna... aku cuma butuh kamu.";
+    const el=document.getElementById("lastMessage");
+    let i=0;
+    el.classList.add("showText");
+
+    function type(){
+        if(i<text.length){
+            el.innerHTML+=text[i];
+            i++;
+            setTimeout(type,40);
+        }
+    }
+    type();
+}
+
+</script>
+</body>
+</html>
